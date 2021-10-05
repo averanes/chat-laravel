@@ -44,4 +44,4 @@ Route::get('chat/{chat}/get_messages', 'App\Http\Controllers\ChatController@get_
 
 Route::post('message/sent', '\App\Http\Controllers\MessageController@sent')->name('message.sent');
 
-//Route::get('chat/with/{user}', 'App\Http\Controllers\ChatController@chat_with')->name('chat.with');
+Route::get('chat/room/{chat}', 'App\Http\Controllers\ChatController@chat_room')->name('chat.room');

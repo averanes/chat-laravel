@@ -9,6 +9,8 @@ const chatId = window.location.pathname.substr(6);
 let authUser;
 let typingTimer = false;
 
+const users = [];
+
 window.onload = function () {
 
   axios.get('/auth/user')
@@ -23,8 +25,10 @@ window.onload = function () {
 
       let results = res.data.users.filter( user => user.id != authUser.id);
 
-      if(results.length > 0)
-        chatWith.innerHTML = results[0].name;
+      if(results.length > 0){
+          addUsers(results);
+      }
+
 
     });
 
@@ -56,20 +60,29 @@ window.onload = function () {
 
         let result = users.filter(user => user.id != authUser.id);
 
-          if(result.length > 0)
-            chatStatus.className = 'chatStatus online';
+          if(result.length > 0){
+              chatStatus.className = 'chatStatus online';
+              addUsers(result);
+          }
 
       })
       .joining(user => {
 
-        if(user.id != authUser.id)
-          chatStatus.className = 'chatStatus online';
+        if(user.id != authUser.id){
+            chatStatus.className = 'chatStatus online';
+
+            addUsers([user]);
+        }
 
       })
       .leaving(user => {
 
-        if(user.id != authUser.id)
-          chatStatus.className = 'chatStatus offline';
+        if(user.id != authUser.id){
+            chatStatus.className = 'chatStatus offline';
+
+            removeUser(user);
+        }
+
 
       })
       .listenForWhisper('typing', e => {
@@ -128,6 +141,34 @@ msgerForm.addEventListener("submit", event => {
   msgerInput.value = "";
 });
 
+function addUsers(usersNew){
+
+    usersNew.forEach( uNew => {
+        const contained = users.find(user => user.id === uNew.id);
+        if(!contained){
+            users.push(uNew);
+        }
+    });
+
+    chatWith.innerHTML = users.map( u => u.name).join(", ");
+}
+
+function removeUser(user){
+
+    console.log('removeUser ', user);
+
+    const index = users.findIndex( u =>  u.id === user.id );
+
+    console.log('index ', index);
+
+    if(index !== -1){
+        users.splice(index);
+    }
+
+    chatWith.innerHTML = users.map( u => u.name).join(", ");
+}
+
+
 function appendMessages(messages)
 {
   let side = 'left';
@@ -173,8 +214,6 @@ function appendMessage(name, img, side, text, date) {
 function sendTypingEvent()
 {
 
-  typingTimer = true;
-
   Echo.join(`chat.${chatId}`)
     .whisper('typing', msgerInput.value.length);
 
@@ -195,7 +234,7 @@ function sendTypingEvent()
     const m = "0" + date.getMinutes();
 
     return `${d}/${mo}/${y} ${h.slice(-2)}:${m.slice(-2)}`;
-    
+
   }
 
   function scrollToBottom()

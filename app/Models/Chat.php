@@ -9,12 +9,17 @@ class Chat extends Model
 {
     use HasFactory;
 
+    protected $fillable = [
+        'id',
+        'isPrivate',
+    ];
+
     public function users()
     {
     	return $this->belongsToMany('App\Models\User');
     }
 
-    public function messages() 
+    public function messages()
     {
     	return $this->hasMany('App\Models\Message');
     }
