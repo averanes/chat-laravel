@@ -2,6 +2,8 @@
 
 use Illuminate\Support\Facades\Route;
 
+use BeyondCode\LaravelWebSockets\Facades\WebSocketsRouter;
+
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -45,3 +47,6 @@ Route::get('chat/{chat}/get_messages', 'App\Http\Controllers\ChatController@get_
 Route::post('message/sent', '\App\Http\Controllers\MessageController@sent')->name('message.sent');
 
 Route::get('chat/room/{chat}', 'App\Http\Controllers\ChatController@chat_room')->name('chat.room');
+
+
+WebSocketsRouter::webSocket('/app/{appKey}', \App\WebSockets\CustomWebSocketHandler::class);
