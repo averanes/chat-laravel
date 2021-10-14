@@ -5,11 +5,16 @@ const PERSON_IMG = "https://image.flaticon.com/icons/svg/145/145867.svg";
 const chatWith = get(".chatWith");
 const typing = get(".typing");
 const chatStatus = get(".chatStatus");
+
+const usersConnected = get("#users-connected");
+
 const chatId = window.location.pathname.substr(6);
 let authUser;
 let typingTimer = false;
 
-const users = [];
+const users = []; // todos los usuarios unidos chat
+
+let onLineUsers = [];
 
 window.onload = function () {
 
@@ -28,7 +33,6 @@ window.onload = function () {
       if(results.length > 0){
           addUsers(results);
       }
-
 
     });
 
@@ -61,26 +65,29 @@ window.onload = function () {
         let result = users.filter(user => user.id != authUser.id);
 
           if(result.length > 0){
-              chatStatus.className = 'chatStatus online';
               addUsers(result);
+
+              addUsersOnline(result);
+
+              checkIfSomeOneIsOnline();
           }
 
       })
       .joining(user => {
 
         if(user.id != authUser.id){
-            chatStatus.className = 'chatStatus online';
-
             addUsers([user]);
+
+            addUsersOnline([user]);
         }
 
       })
       .leaving(user => {
 
         if(user.id != authUser.id){
-            chatStatus.className = 'chatStatus offline';
+           // removeUser(user);
 
-            removeUser(user);
+            removeUserOnline(user);
         }
 
 
@@ -153,7 +160,7 @@ function addUsers(usersNew){
     chatWith.innerHTML = users.map( u => u.name).join(", ");
 }
 
-function removeUser(user){
+/*function removeUser(user){
 
     console.log('removeUser ', user);
 
@@ -166,8 +173,7 @@ function removeUser(user){
     }
 
     chatWith.innerHTML = users.map( u => u.name).join(", ");
-}
-
+}*/
 
 function appendMessages(messages)
 {
@@ -241,3 +247,35 @@ function sendTypingEvent()
   {
     msgerChat.scrollTop = msgerChat.scrollHeight;
   }
+
+
+function addUsersOnline(usersNew){
+
+    usersNew.forEach( uNew => {
+        const contained = onLineUsers.find(user => user.id === uNew.id);
+        if(!contained){
+            onLineUsers.push(uNew);
+        }
+    });
+
+    checkIfSomeOneIsOnline();
+}
+
+function removeUserOnline(user){
+
+    const index = onLineUsers.findIndex( u =>  u.id === user.id );
+
+    if(index !== -1){
+        onLineUsers.splice(index);
+    }
+
+    checkIfSomeOneIsOnline();
+}
+
+function checkIfSomeOneIsOnline(){
+    let online = onLineUsers?.length
+
+    chatStatus.className = online ? 'chatStatus online' : 'chatStatus offline';
+
+    usersConnected.innerHTML = online ? `${online} online` : 'nobody is online';
+}

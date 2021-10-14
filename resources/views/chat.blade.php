@@ -14,12 +14,13 @@
 		<section class="msger">
 			<header class="msger-header">
 				<div class="msger-header-title">
-					<i class="fas fa-comment-alt"></i> 
-					<span class="chatWith"></span> 
+					<i class="fas fa-comment-alt"></i>
+					<span class="chatWith"></span>
 					<span class="typing" style="display: none;"> está escribiendo</span>
 				</div>
 				<div class="msger-header-options">
 					<span class="chatStatus offline">
+                        <span id="users-connected"></span>
 						<i class="fas fa-globe"></i>
 					</span>
 				</div>
